@@ -1,5 +1,5 @@
 # refinereads
-An efficient tool to remove sequencing duplications, eliminate sequencing errors by generating consensus reads and add some custom raw reads statistics information.
+A versatile alignment reads refinement tool to correct the dual artificial sequence introduced by enzyme cutting, remove potential duplicated reads, eliminate sequencing errors by generating consensus reads and some custom raw reads statistics information.
 * [What's refinereads](#whats-refinereads)
 * [Download, compile and install](#get-refinereads)
  [Why to use refinereads](#why-to-use-refinereads)
@@ -11,7 +11,7 @@ An efficient tool to remove sequencing duplications, eliminate sequencing errors
 * [Read/cite refinereads paper](#citation)
 
 # what's refinereads?
-`refinereads` is a tool for fast and powerful deduplication for paired-end next-generation sequencing (NGS) data. It is much faster and uses much less memory than Picard and other tools. It generates very informative reports in both HTML and JSON formats. It's based on an algorithm for `generating consensus reads`, and that's why it's named `refinereads`.
+`refinereads` is a tool for fast and powerful deduplication for paired-end next-generation sequencing (NGS) data. It is much faster and uses much less memory than Picard and other tools. It generates very informative reports in both HTML and JSON formats.
 
 Basically, `refinereads` groups the reads derived from the same original DNA template, merges them by generating a consensus read, which contains much less errors than the original reads.
 
@@ -19,7 +19,7 @@ Basically, `refinereads` groups the reads derived from the same original DNA tem
 
 This tool can eliminate the errors introduced by library preparation and sequencing processes, and consenquently reduce the false positives for downstream variant calling. This tool can also be used to remove duplicated reads. Since it generates consensus reads from duplicated reads, it outputs much cleaner data than conventional duplication remover. ***Due to these advantages, it is especially useful for processing ultra-deep sequencing data for cancer samples.***
 
-`refinereads` accepts a sorted BAM/SAM with its corresponding reference fasta as input, and outputs an unsorted BAM/SAM.
+`refinereads` accepts a sorted BAM/SAM with its corresponding reference fasta as input, and outputs a sorted BAM/SAM.
 
 # take a quick glance of the informative report
 * Sample HTML report: http://opengene.org/refinereads/refinereads.html
@@ -53,7 +53,7 @@ refinereads -i input.sorted.bam -o output.bam -r hg19.fasta -b test.bed -s 2
 ## compile from source
 ```shell
 # step 1: download and compile htslib from: https://github.com/samtools/htslib
-# step 2: get refinereads source (you can also use browser to download from master or releases)
+# step 2: get refinereads source (you can also use browser to download from main branch)
 git clone https://github.com/Schaudge/refinereads.git
 
 # step 3: build
@@ -68,13 +68,13 @@ sudo make install
 As described above, refinereads can eliminate the errors introduced by library preparation and sequencing processes, and consenquently it can greatly reduce the false positives for downstream variant calling. Let me show your an example.
 
 ## original BAM
-![image](http://www.opengene.org/refinereads/original.png)   
+![image](http://www.opengene.org/gencore/original.png)   
 
 ***This is an image showing a pileup of the original BAM. A lot of sequencing errors can be observed.***
 
 
 ## refinereads processed BAM
-![image](http://www.opengene.org/refinereads/processed.png)   
+![image](http://www.opengene.org/gencore/processed.png)   
 
 ***This is the image showing the result of refinereads processed BAM. It becomes much cleaner. Cheers!***
 
@@ -84,10 +84,10 @@ refinereads also performs some quality control when processing deduplication and
 refinereads reports the results both in HTML format and JSON format for manually checking and downstream analysis. See the examples of interactive [HTML](http://opengene.org/refinereads/refinereads.html) report and [JSON](http://opengene.org/refinereads/refinereads.json) reports.
 
 ## coverate statistics in genome scale
-![image](http://www.opengene.org/refinereads/coverage-genome.jpeg) 
+![image](http://www.opengene.org/gencore/coverage-genome.jpeg) 
 
 ## coverate statistics in capturing regions
-![image](http://www.opengene.org/refinereads/coverage-bed.jpeg) 
+![image](http://www.opengene.org/gencore/coverage-bed.jpeg) 
 
 # understand the output
 refinereads outputs following files:
