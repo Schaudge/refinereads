@@ -56,7 +56,7 @@ string HtmlReporter::getPercents(long numerator, long denominator) {
 void HtmlReporter::printSummary(ofstream& ofs,  Stats* preStats, Stats* postStats) {
 
     ofs << endl;
-    ofs << "<h1 style='text-align:left;'><a href='https://github.com/OpenGene/gencore' target='_blank' style='color:#663355;text-decoration:none;'>" + mOptions->reportTitle + "</a>"<<endl;
+    ofs << "<h1 style='text-align:left;'><a href='https://github.com/OpenGene/refinereads' target='_blank' style='color:#663355;text-decoration:none;'>" + mOptions->reportTitle + "</a>"<<endl;
     ofs << "<div class='section_div'>\n";
     ofs << "<div class='section_title' onclick=showOrHide('summary')><a name='summary'>Summary</a></div>\n";
     ofs << "<div id='summary'>\n";
@@ -64,7 +64,7 @@ void HtmlReporter::printSummary(ofstream& ofs,  Stats* preStats, Stats* postStat
     ofs << "<div class='subsection_title' onclick=showOrHide('general')>General</div>\n";
     ofs << "<div id='general'>\n";
     ofs << "<table class='summary_table'>\n";
-    outputRow(ofs, "gencore version:", string(VERSION_NUMBER)+ " (<a href='https://github.com/OpenGene/gencore'>https://github.com/OpenGene/gencore</a>)");
+    outputRow(ofs, "refinereads version:", string(VERSION_NUMBER)+ " (<a href='https://github.com/OpenGene/refinereads'>https://github.com/OpenGene/refinereads</a>)");
     outputRow(ofs, "mapping rate:", to_string(preStats->getMappingRate()));
     outputRow(ofs, "duplication rate:", to_string(preStats->getDupRate()));
     outputRow(ofs, "Single Stranded Consensus Sequence:", to_string(postStats->mSSCSNum));
@@ -416,7 +416,7 @@ void HtmlReporter::report(Stats* preStats, Stats* postStats) {
 
 void HtmlReporter::printHeader(ofstream& ofs){
     ofs << "<html><head><meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\" />";
-    ofs << "<title>gencore report at " + getCurrentSystemTime() + " </title>";
+    ofs << "<title>refinereads report at " + getCurrentSystemTime() + " </title>";
     printJS(ofs);
     printCSS(ofs);
     ofs << "</head>";
@@ -480,6 +480,6 @@ void HtmlReporter::printFooter(ofstream& ofs){
     ofs << "\n</div>" << endl;
     ofs << "<div id='footer'> ";
     ofs << "<p>"<<command<<"</p>";
-    ofs << "gencore " << VERSION_NUMBER << ", at " << getCurrentSystemTime() << " </div>";
+    ofs << "refinereads " << VERSION_NUMBER << ", at " << getCurrentSystemTime() << " </div>";
     ofs << "</body></html>";
 }

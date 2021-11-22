@@ -46,10 +46,10 @@ struct bamComp{
     }
 };
 
-class Gencore {
+class Refinereads {
 public:
-    Gencore(Options *opt);
-    ~Gencore();
+    Refinereads(Options *opt);
+    ~Refinereads();
 
     void consensus();
 

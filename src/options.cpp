@@ -30,7 +30,7 @@ Options::Options(){
     baseScoreReq = scoreOfNotOverlappedModerateQual;
     skipLowComplexityClusterThreshold = 1000;
 
-    reportTitle = "gencore report";
+    reportTitle = "refinereads report";
 
     bedCoverageStep = 10;
     coverageStep = 10000;

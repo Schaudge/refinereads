@@ -5,7 +5,7 @@
 #include "common.h"
 #include <sstream>
 #include "util.h"
-#include "gencore.h"
+#include "refinereads.h"
 #include "options.h"
 #include "reference.h"
 #include "unittest.h"
@@ -22,7 +22,7 @@ int main(int argc, char* argv[]){
     }
 
     if (argc == 2 && (strcmp(argv[1], "-v")==0 || strcmp(argv[1], "--version")==0)){
-        cerr << "gencore " << VERSION_NUMBER << endl;
+        cerr << "refinereads " << VERSION_NUMBER << endl;
         return 0;
     }
 
@@ -50,8 +50,8 @@ int main(int argc, char* argv[]){
     cmd.add<int>("coverage_sampling", 0, "the sampling rate for genome scale coverage statistics. Default 10000 means 1/10000.", false, 10000);
 
     // reporting
-    cmd.add<string>("json", 'j', "the json format report file name", false, "gencore.json");
-    cmd.add<string>("html", 'h', "the html format report file name", false, "gencore.html");
+    cmd.add<string>("json", 'j', "the json format report file name", false, "refinereads.json");
+    cmd.add<string>("html", 'h', "the html format report file name", false, "refinereads.html");
 
     // debugging
     cmd.add("debug", 0, "output some debug information to STDERR.");
@@ -103,8 +103,8 @@ int main(int argc, char* argv[]){
     }
     command = ss.str();
 
-    Gencore gencore(&opt);
-    gencore.consensus();
+    Refinereads refinereads(&opt);
+    refinereads.consensus();
 
     if(reference) {
         delete reference;
@@ -113,7 +113,7 @@ int main(int argc, char* argv[]){
 
     time_t t2 = time(NULL);
     cerr << endl << command << endl;
-    cerr << "gencore v" << VERSION_NUMBER << ", time used: " << (t2)-t1 << " seconds" << endl;
+    cerr << "refinereads v" << VERSION_NUMBER << ", time used: " << (t2)-t1 << " seconds" << endl;
 
     return 0;
 }

@@ -1,10 +1,10 @@
-#include "gencore.h"
+#include "refinereads.h"
 #include "bamutil.h"
 #include "jsonreporter.h"
 #include "htmlreporter.h"
 #include <limits.h>
 
-Gencore::Gencore(Options *opt){
+Refinereads::Refinereads(Options *opt){
     mOptions = opt;
     mBamHeader = NULL;
     mOutSam = NULL;
@@ -18,7 +18,7 @@ Gencore::Gencore(Options *opt){
     mProperClustersFinished = false;
 }
 
-Gencore::~Gencore(){
+Refinereads::~Refinereads(){
     outputOutSet();
     releaseClusters(mProperClusters);
     releaseClusters(mUnProperClusters);
@@ -36,14 +36,14 @@ Gencore::~Gencore(){
     delete mPostStats;
 }
 
-void Gencore::report() {
+void Refinereads::report() {
     JsonReporter jsonreporter(mOptions);
     jsonreporter.report(mPreStats, mPostStats);
     HtmlReporter htmlreporter(mOptions);
     htmlreporter.report(mPreStats, mPostStats);
 }
 
-void Gencore::releaseClusters(map<int, map<int, map<long, Cluster*>>>& clusters) {
+void Refinereads::releaseClusters(map<int, map<int, map<long, Cluster*>>>& clusters) {
     map<int, map<int, map<long, Cluster*>>>::iterator iter1;
     map<int, map<long, Cluster*>>::iterator iter2;
     map<long, Cluster*>::iterator iter3;
@@ -56,7 +56,7 @@ void Gencore::releaseClusters(map<int, map<int, map<long, Cluster*>>>& clusters)
     }
 }
 
-void Gencore::dumpClusters(map<int, map<int, map<long, Cluster*>>>& clusters) {
+void Refinereads::dumpClusters(map<int, map<int, map<long, Cluster*>>>& clusters) {
     map<int, map<int, map<long, Cluster*>>>::iterator iter1;
     map<int, map<long, Cluster*>>::iterator iter2;
     map<long, Cluster*>::iterator iter3;
@@ -69,7 +69,7 @@ void Gencore::dumpClusters(map<int, map<int, map<long, Cluster*>>>& clusters) {
     }
 }
 
-void Gencore::outputOutSet() {
+void Refinereads::outputOutSet() {
     set<bam1_t*, bamComp>::iterator iter;
     for(iter = mOutSet.begin(); iter!=mOutSet.end(); iter++) {
         writeBam(*iter);
@@ -80,7 +80,7 @@ void Gencore::outputOutSet() {
     mOutSetCleared = true;
 }
 
-void Gencore::writeBam(bam1_t* b) {
+void Refinereads::writeBam(bam1_t* b) {
     static int lastTid = -1;
     static int lastPos = -1;
     static bool warnedUnordered = false;
@@ -110,7 +110,7 @@ void Gencore::writeBam(bam1_t* b) {
     mPostStats->addRead(b);
 }
 
-void Gencore::outputBam(bam1_t* b, bool isLeft) {
+void Refinereads::outputBam(bam1_t* b, bool isLeft) {
     pair<set<bam1_t*, bamComp>::iterator,bool> ret = mOutSet.insert(b);
     //cerr << "inserting " << (b)->core.tid << ":" << (b)->core.pos << endl;
     //cerr << "head " << (*mOutSet.begin())->core.tid << ":" << (*mOutSet.begin())->core.pos << endl;
@@ -142,7 +142,7 @@ void Gencore::outputBam(bam1_t* b, bool isLeft) {
     }
 }
 
-void Gencore::outputPair(Pair* p) {
+void Refinereads::outputPair(Pair* p) {
     mPostStats->addMolecule(1, p->mLeft && p->mRight);
 
     if(mOutSam == NULL || mBamHeader == NULL)
@@ -159,7 +159,7 @@ void Gencore::outputPair(Pair* p) {
     }
 }
 
-void Gencore::consensus(){
+void Refinereads::consensus(){
     samFile *in;
     in = sam_open(mOptions->input.c_str(), "r");
     if (!in) {
@@ -226,7 +226,7 @@ void Gencore::consensus(){
                 hasPE = true;
         }
         if(count == 1000 && hasPE == false) {
-            cerr << "WARNING: seems that the input data is single-end, gencore will not make consensus read and remove duplication for SE data since grouping by coordination will be inaccurate." << endl << endl;
+            cerr << "WARNING: seems that the input data is single-end, refinereads will not make consensus read and remove duplication for SE data since grouping by coordination will be inaccurate." << endl << endl;
         }
 
         // check whether the BAM is sorted
@@ -283,16 +283,16 @@ void Gencore::consensus(){
     bam_destroy1(b);
     sam_close(in);
 
-    cerr << "----Before gencore processing:" << endl;
+    cerr << "----Before refinereads processing:" << endl;
     mPreStats->print();
 
-    cerr << endl << "----After gencore processing:" << endl;
+    cerr << endl << "----After refinereads processing:" << endl;
     mPostStats->print();
 
     report();
 }
 
-void Gencore::addToProperCluster(bam1_t* b) {
+void Refinereads::addToProperCluster(bam1_t* b) {
     int tid = b->core.tid;
     int left = b->core.pos;
     long right;
@@ -389,7 +389,7 @@ void Gencore::addToProperCluster(bam1_t* b) {
     }
 }
 
-void Gencore::finishConsensus(map<int, map<int, map<long, Cluster*>>>& clusters) {
+void Refinereads::finishConsensus(map<int, map<int, map<long, Cluster*>>>& clusters) {
     // make consensus merge
     map<int, map<int, map<long, Cluster*>>>::iterator iter1;
     map<int, map<long, Cluster*>>::iterator iter2;
@@ -433,7 +433,7 @@ void Gencore::finishConsensus(map<int, map<int, map<long, Cluster*>>>& clusters)
     }
 }
 
-void Gencore::addToUnProperCluster(bam1_t* b) {
+void Refinereads::addToUnProperCluster(bam1_t* b) {
     int tid = b->core.tid;
     int left = b->core.pos;
     long right = b->core.mpos;
@@ -446,7 +446,7 @@ void Gencore::addToUnProperCluster(bam1_t* b) {
     mUnProperClusters[tid][left][right]->addRead(b);
 }
 
-void Gencore::createCluster(map<int, map<int, map<long, Cluster*>>>& clusters, int tid, int left, long right) {
+void Refinereads::createCluster(map<int, map<int, map<long, Cluster*>>>& clusters, int tid, int left, long right) {
     map<int, map<int, map<long, Cluster*>>>::iterator iter1 = clusters.find(tid);
 
     if(iter1 == clusters.end()) {
@@ -466,7 +466,7 @@ void Gencore::createCluster(map<int, map<int, map<long, Cluster*>>>& clusters, i
     }
 }
 
-void Gencore::addToCluster(bam1_t* b) {
+void Refinereads::addToCluster(bam1_t* b) {
     // unproperly mapped
     if(b->core.tid < 0) {
         // actually this will never happen since it would be written directly if it's unmapped

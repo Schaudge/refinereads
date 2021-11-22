@@ -1,8 +1,8 @@
 # refinereads
 An efficient tool to remove sequencing duplications, eliminate sequencing errors by generating consensus reads and add some custom raw reads statistics information.
-* [What's refinereads](#whats-gencore)
-* [Download, compile and install](#get-gencore)
-* [Why to use refinereads](#why-to-use-gencore)
+* [What's refinereads](#whats-refinereads)
+* [Download, compile and install](#get-refinereads)
+ [Why to use refinereads](#why-to-use-refinereads)
 * [Understand the output](#understand-the-output)
 * [How it works](#how-it-works)
 * [Command examples](#command-examples)
@@ -11,29 +11,29 @@ An efficient tool to remove sequencing duplications, eliminate sequencing errors
 * [Read/cite refinereads paper](#citation)
 
 # what's refinereads?
-`refinereads` is a tool for fast and powerful deduplication for paired-end next-generation sequencing (NGS) data. It is much faster and uses much less memory than Picard and other tools. It generates very informative reports in both HTML and JSON formats. It's based on an algorithm for `generating consensus reads`, and that's why it's named `gencore`.
+`refinereads` is a tool for fast and powerful deduplication for paired-end next-generation sequencing (NGS) data. It is much faster and uses much less memory than Picard and other tools. It generates very informative reports in both HTML and JSON formats. It's based on an algorithm for `generating consensus reads`, and that's why it's named `refinereads`.
 
-Basically, `gencore` groups the reads derived from the same original DNA template, merges them by generating a consensus read, which contains much less errors than the original reads.
+Basically, `refinereads` groups the reads derived from the same original DNA template, merges them by generating a consensus read, which contains much less errors than the original reads.
 
-`refinereads` supports the data with unique molecular identifiers (UMI). If your FASTQ data has UMI integrated, you can use [fastp](https://github.com/OpenGene/fastp) to shift the UMI to read query names, and use `gencore` to generate consensus reads.
+`refinereads` supports the data with unique molecular identifiers (UMI). If your FASTQ data has UMI integrated, you can use [fastp](https://github.com/OpenGene/fastp) to shift the UMI to read query names, and use `refinereads` to generate consensus reads.
 
 This tool can eliminate the errors introduced by library preparation and sequencing processes, and consenquently reduce the false positives for downstream variant calling. This tool can also be used to remove duplicated reads. Since it generates consensus reads from duplicated reads, it outputs much cleaner data than conventional duplication remover. ***Due to these advantages, it is especially useful for processing ultra-deep sequencing data for cancer samples.***
 
-`gencore` accepts a sorted BAM/SAM with its corresponding reference fasta as input, and outputs an unsorted BAM/SAM.
+`refinereads` accepts a sorted BAM/SAM with its corresponding reference fasta as input, and outputs an unsorted BAM/SAM.
 
 # take a quick glance of the informative report
-* Sample HTML report: http://opengene.org/gencore/gencore.html
-* Sample JSON report: http://opengene.org/gencore/gencore.json
+* Sample HTML report: http://opengene.org/refinereads/refinereads.html
+* Sample JSON report: http://opengene.org/refinereads/refinereads.json
 
-# try gencore to refinereads above reports
-* BAM file for testing: http://opengene.org/gencore/input.sorted.bam
-* BED file for testing: http://opengene.org/gencore/test.bed
+# try refinereads to refinereads above reports
+* BAM file for testing: http://opengene.org/refinereads/input.sorted.bam
+* BED file for testing: http://opengene.org/refinereads/test.bed
 * Reference genome file: [ftp://ftp.ncbi.nlm.nih.gov/sra/reports/Assembly/GRCh37-HG19_Broad_variant/Homo_sapiens_assembly19.fasta](ftp://ftp.ncbi.nlm.nih.gov/sra/reports/Assembly/GRCh37-HG19_Broad_variant/Homo_sapiens_assembly19.fasta)
 * Command for testing: 
 ```shell
 refinereads -i input.sorted.bam -o output.bam -r Homo_sapiens_assembly19.fasta -b test.bed --coverage_sampling=50000
 ```
-* After the processing is finished, check the `gencore.html` and `gencore.json` in the working directory. The option `--coverage_sampling=50000` is to change the default setting `(coverage_sampling=10000)` to generate smaller report files by reducing the coverage sampling rate.
+* After the processing is finished, check the `refinereads.html` and `refinereads.json` in the working directory. The option `--coverage_sampling=50000` is to change the default setting `(coverage_sampling=10000)` to generate smaller report files by reducing the coverage sampling rate.
 
 # quick examples
 The simplest way
@@ -49,11 +49,11 @@ Only output the fragment with >=2 supporting reads (useful for aggressive denois
 refinereads -i input.sorted.bam -o output.bam -r hg19.fasta -b test.bed -s 2
 ```
 
-# get gencore
+# get refinereads
 ## compile from source
 ```shell
 # step 1: download and compile htslib from: https://github.com/samtools/htslib
-# step 2: get gencore source (you can also use browser to download from master or releases)
+# step 2: get refinereads source (you can also use browser to download from master or releases)
 git clone https://github.com/Schaudge/refinereads.git
 
 # step 3: build
@@ -64,30 +64,30 @@ make
 sudo make install
 ```
 
-# why to use gencore?
-As described above, gencore can eliminate the errors introduced by library preparation and sequencing processes, and consenquently it can greatly reduce the false positives for downstream variant calling. Let me show your an example.
+# why to use refinereads?
+As described above, refinereads can eliminate the errors introduced by library preparation and sequencing processes, and consenquently it can greatly reduce the false positives for downstream variant calling. Let me show your an example.
 
 ## original BAM
-![image](http://www.opengene.org/gencore/original.png)   
+![image](http://www.opengene.org/refinereads/original.png)   
 
 ***This is an image showing a pileup of the original BAM. A lot of sequencing errors can be observed.***
 
 
-## gencore processed BAM
-![image](http://www.opengene.org/gencore/processed.png)   
+## refinereads processed BAM
+![image](http://www.opengene.org/refinereads/processed.png)   
 
 ***This is the image showing the result of refinereads processed BAM. It becomes much cleaner. Cheers!***
 
 # QC result reported by refinereads
-refinereads also performs some quality control when processing deduplication and generating consensus reads. Basically it reports mapping rate, duplication rate, mismatch rate and some statisticical results. Especially, gencore reports the coverate statistics of input BAM file in genome scale, and in capturing regions (if a BED file is specified).
+refinereads also performs some quality control when processing deduplication and generating consensus reads. Basically it reports mapping rate, duplication rate, mismatch rate and some statisticical results. Especially, refinereads reports the coverate statistics of input BAM file in genome scale, and in capturing regions (if a BED file is specified).
 
-refinereads reports the results both in HTML format and JSON format for manually checking and downstream analysis. See the examples of interactive [HTML](http://opengene.org/gencore/gencore.html) report and [JSON](http://opengene.org/gencore/gencore.json) reports.
+refinereads reports the results both in HTML format and JSON format for manually checking and downstream analysis. See the examples of interactive [HTML](http://opengene.org/refinereads/refinereads.html) report and [JSON](http://opengene.org/refinereads/refinereads.json) reports.
 
 ## coverate statistics in genome scale
-![image](http://www.opengene.org/gencore/coverage-genome.jpeg) 
+![image](http://www.opengene.org/refinereads/coverage-genome.jpeg) 
 
 ## coverate statistics in capturing regions
-![image](http://www.opengene.org/gencore/coverage-bed.jpeg) 
+![image](http://www.opengene.org/refinereads/coverage-bed.jpeg) 
 
 # understand the output
 refinereads outputs following files:
@@ -112,7 +112,7 @@ important steps:
 6. when checking the reference, if there exists one or more reads are concordant with reference genome with high quality, or all reads at this positions are with low quality, use the reference nucleotide for this position.
 
 ## the quality thresholds
-`gencore` uses 3 different thresholds, and they can be specified by the commandline options：
+`refinereads` uses 3 different thresholds, and they can be specified by the commandline options：
 
 | Quality threshold | Default Score | CMD option |
 |- | - | - |
@@ -167,7 +167,7 @@ refinereads -i in.bam -o out.bam -r hg19.fa --duplex_only -s 3 --ratio_threshold
 Please note that only UMI-integrated paired-end data can be used to generate duplex consensuses sequences.
 
 # UMI format
-`gencore` supports calling consensus reads with or without UMI. Although UMI is not required, it is strongly recommended. If your FASTQ data has UMI integrated, you can use [fastp](https://github.com/OpenGene/fastp) to shift the UMI to read query names.  
+`refinereads` supports calling consensus reads with or without UMI. Although UMI is not required, it is strongly recommended. If your FASTQ data has UMI integrated, you can use [fastp](https://github.com/OpenGene/fastp) to shift the UMI to read query names.  
 
 The UMI should in the tail of query names. It can have a prefix like `UMI`, followed by an underscore. If the UMI has a prefix, it should be specified by `--umi_prefix` or `-u`. If the UMI prefix is `umi` or `UMI`, it can be automatically detected. The UMI can also have two parts, which are connected by an underscore.   
 
@@ -196,13 +196,13 @@ options:
       --moderate_qual            the threshold for a quality score to be considered as moderate quality. Default 20 means Q20. (int [=20])
       --low_qual                 the threshold for a quality score to be considered as low quality. Default 15 means Q15. (int [=15])
       --coverage_sampling        the sampling rate for genome scale coverage statistics. Default 10000 means 1/10000. (int [=10000])
-  -j, --json                     the json format report file name (string [=gencore.json])
-  -h, --html                     the html format report file name (string [=gencore.html])
+  -j, --json                     the json format report file name (string [=refinereads.json])
+  -h, --html                     the html format report file name (string [=refinereads.html])
       --debug                    output some debug information to STDERR.
       --quit_after_contig        stop when <quit_after_contig> contigs are processed. Only used for fast debugging. Default 0 means no limitation. (int [=0])
   -?, --help                     print this message
 ```
 # citation
-The refinereads paper has been published in  BMC Bioinformatics: https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-3280-9. If you used gencore in your research work, please cite it as:
+The refinereads paper has been published in  BMC Bioinformatics: https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-3280-9. If you used refinereads in your research work, please cite it as:
 
 Chen, S., Zhou, Y., Chen, Y. et al. Gencore: an efficient tool to generate consensus reads for error suppressing and duplicate removing of NGS data. BMC Bioinformatics 20, 606 (2019) doi:10.1186/s12859-019-3280-9

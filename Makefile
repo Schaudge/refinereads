@@ -6,7 +6,7 @@ BINDIR=/usr/local/bin
 SRC = $(wildcard ${DIR_SRC}/*.cpp)  
 OBJ = $(patsubst %.cpp,${DIR_OBJ}/%.o,$(notdir ${SRC})) 
 
-TARGET = gencore
+TARGET = refinereads
 
 BIN_TARGET = ${TARGET}
 
