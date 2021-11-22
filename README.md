@@ -1,7 +1,7 @@
 [![install with conda](
 https://anaconda.org/bioconda/gencore/badges/version.svg)](https://anaconda.org/bioconda/gencore)
 # gencore
-An efficient tool to remove sequencing duplications and eliminate sequencing errors by generating consensus reads.
+An efficient tool to remove sequencing duplications, eliminate sequencing errors by generating consensus reads and add some custom raw reads statistics information.
 * [What's gencore](#whats-gencore)
 * [Download, compile and install](#get-gencore)
 * [Why to use gencore](#why-to-use-gencore)
