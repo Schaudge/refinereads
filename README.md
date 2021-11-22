@@ -1,23 +1,21 @@
-[![install with conda](
-https://anaconda.org/bioconda/gencore/badges/version.svg)](https://anaconda.org/bioconda/gencore)
-# gencore
+# refinereads
 An efficient tool to remove sequencing duplications, eliminate sequencing errors by generating consensus reads and add some custom raw reads statistics information.
-* [What's gencore](#whats-gencore)
+* [What's refinereads](#whats-gencore)
 * [Download, compile and install](#get-gencore)
-* [Why to use gencore](#why-to-use-gencore)
+* [Why to use refinereads](#why-to-use-gencore)
 * [Understand the output](#understand-the-output)
 * [How it works](#how-it-works)
 * [Command examples](#command-examples)
 * [UMI format](#umi-format)
 * [All options](#all-options)
-* [Read/cite gencore paper](#citation)
+* [Read/cite refinereads paper](#citation)
 
-# what's gencore?
-`gencore` is a tool for fast and powerful deduplication for paired-end next-generation sequencing (NGS) data. It is much faster and uses much less memory than Picard and other tools. It generates very informative reports in both HTML and JSON formats. It's based on an algorithm for `generating consensus reads`, and that's why it's named `gencore`.
+# what's refinereads?
+`refinereads` is a tool for fast and powerful deduplication for paired-end next-generation sequencing (NGS) data. It is much faster and uses much less memory than Picard and other tools. It generates very informative reports in both HTML and JSON formats. It's based on an algorithm for `generating consensus reads`, and that's why it's named `gencore`.
 
 Basically, `gencore` groups the reads derived from the same original DNA template, merges them by generating a consensus read, which contains much less errors than the original reads.
 
-`gencore` supports the data with unique molecular identifiers (UMI). If your FASTQ data has UMI integrated, you can use [fastp](https://github.com/OpenGene/fastp) to shift the UMI to read query names, and use `gencore` to generate consensus reads.
+`refinereads` supports the data with unique molecular identifiers (UMI). If your FASTQ data has UMI integrated, you can use [fastp](https://github.com/OpenGene/fastp) to shift the UMI to read query names, and use `gencore` to generate consensus reads.
 
 This tool can eliminate the errors introduced by library preparation and sequencing processes, and consenquently reduce the false positives for downstream variant calling. This tool can also be used to remove duplicated reads. Since it generates consensus reads from duplicated reads, it outputs much cleaner data than conventional duplication remover. ***Due to these advantages, it is especially useful for processing ultra-deep sequencing data for cancer samples.***
 
@@ -27,52 +25,39 @@ This tool can eliminate the errors introduced by library preparation and sequenc
 * Sample HTML report: http://opengene.org/gencore/gencore.html
 * Sample JSON report: http://opengene.org/gencore/gencore.json
 
-# try gencore to generate above reports
+# try gencore to refinereads above reports
 * BAM file for testing: http://opengene.org/gencore/input.sorted.bam
 * BED file for testing: http://opengene.org/gencore/test.bed
 * Reference genome file: [ftp://ftp.ncbi.nlm.nih.gov/sra/reports/Assembly/GRCh37-HG19_Broad_variant/Homo_sapiens_assembly19.fasta](ftp://ftp.ncbi.nlm.nih.gov/sra/reports/Assembly/GRCh37-HG19_Broad_variant/Homo_sapiens_assembly19.fasta)
 * Command for testing: 
 ```shell
-gencore -i input.sorted.bam -o output.bam -r Homo_sapiens_assembly19.fasta -b test.bed --coverage_sampling=50000
+refinereads -i input.sorted.bam -o output.bam -r Homo_sapiens_assembly19.fasta -b test.bed --coverage_sampling=50000
 ```
 * After the processing is finished, check the `gencore.html` and `gencore.json` in the working directory. The option `--coverage_sampling=50000` is to change the default setting `(coverage_sampling=10000)` to generate smaller report files by reducing the coverage sampling rate.
 
 # quick examples
 The simplest way
 ```shell
-gencore -i input.sorted.bam -o output.bam -r hg19.fasta
+refinereads -i input.sorted.bam -o output.bam -r hg19.fasta
 ```
 With a BED file to specify the capturing regions
 ```shell
-gencore -i input.sorted.bam -o output.bam -r hg19.fasta -b test.bed
+refinereads -i input.sorted.bam -o output.bam -r hg19.fasta -b test.bed
 ```
 Only output the fragment with >=2 supporting reads (useful for aggressive denoising)
 ```shell
-gencore -i input.sorted.bam -o output.bam -r hg19.fasta -b test.bed -s 2
+refinereads -i input.sorted.bam -o output.bam -r hg19.fasta -b test.bed -s 2
 ```
 
 # get gencore
-## install with Bioconda
-[![install with conda](
-https://anaconda.org/bioconda/gencore/badges/version.svg)](https://anaconda.org/bioconda/gencore)
-```shell
-conda install -c bioconda gencore
-```
-## download binary 
-This binary is only for Linux systems: http://opengene.org/gencore/gencore
-```shell
-# this binary was compiled on CentOS, and tested on CentOS/Ubuntu
-wget http://opengene.org/gencore/gencore
-chmod a+x ./gencore
-```
-## or compile from source
+## compile from source
 ```shell
 # step 1: download and compile htslib from: https://github.com/samtools/htslib
 # step 2: get gencore source (you can also use browser to download from master or releases)
-git clone https://github.com/OpenGene/gencore.git
+git clone https://github.com/Schaudge/refinereads.git
 
 # step 3: build
-cd gencore
+cd refinereads
 make
 
 # step 4: install
@@ -91,12 +76,12 @@ As described above, gencore can eliminate the errors introduced by library prepa
 ## gencore processed BAM
 ![image](http://www.opengene.org/gencore/processed.png)   
 
-***This is the image showing the result of gencore processed BAM. It becomes much cleaner. Cheers!***
+***This is the image showing the result of refinereads processed BAM. It becomes much cleaner. Cheers!***
 
-# QC result reported by gencore
-gencore also performs some quality control when processing deduplication and generating consensus reads. Basically it reports mapping rate, duplication rate, mismatch rate and some statisticical results. Especially, gencore reports the coverate statistics of input BAM file in genome scale, and in capturing regions (if a BED file is specified).
+# QC result reported by refinereads
+refinereads also performs some quality control when processing deduplication and generating consensus reads. Basically it reports mapping rate, duplication rate, mismatch rate and some statisticical results. Especially, gencore reports the coverate statistics of input BAM file in genome scale, and in capturing regions (if a BED file is specified).
 
-gencore reports the results both in HTML format and JSON format for manually checking and downstream analysis. See the examples of interactive [HTML](http://opengene.org/gencore/gencore.html) report and [JSON](http://opengene.org/gencore/gencore.json) reports.
+refinereads reports the results both in HTML format and JSON format for manually checking and downstream analysis. See the examples of interactive [HTML](http://opengene.org/gencore/gencore.html) report and [JSON](http://opengene.org/gencore/gencore.json) reports.
 
 ## coverate statistics in genome scale
 ![image](http://www.opengene.org/gencore/coverage-genome.jpeg) 
@@ -105,7 +90,7 @@ gencore reports the results both in HTML format and JSON format for manually che
 ![image](http://www.opengene.org/gencore/coverage-bed.jpeg) 
 
 # understand the output
-gencore outputs following files:
+refinereads outputs following files:
 1. the processed BAM. In this BAM, each consensus read will have a tag `FR`, which means `forward read number of this consensus read`. If the read is a duplex consensus read, it will also has a tag `RR`, which means `reverse read number of this consensus read`. Downstream tools can read the `FR` and `RR` tags for further processing or variant calling. In following example, the first read is a single-stranded consensus sequence (only has a `FR` tag), and the second read is a duplex consensus sequence (has both `FR` and `RR` tags):
 ```
 A00250:28:H2HC3DSX2:1:1117:3242:5321:UMI_GCT_CTA        161     chr12   25377992        60      143M    =       25378431        582
@@ -136,7 +121,7 @@ important steps:
 | Low Quality | 15 (Q15) | --low_qual |
 
 ## the scoring
-`gencore` assigns a score to each base in a read of a read cluster, the score means the confidence of this base. The score is given by following rules:
+`refinereads` assigns a score to each base in a read of a read cluster, the score means the confidence of this base. The score is given by following rules:
 
 | in overlapped region? | matched with its pair? | condition? | score for this base |
 | - | - | - | - |
@@ -165,19 +150,19 @@ In the overlapped region, if a base and its pair are mismatched, its quality sco
 # command examples
 If you want to get very clean data, we can only keep the clusters with 2 or more supporting reads (recommended for ultra-deep sequencing with higher dup-rate):
 ```
-gencore -i in.bam -o out.bam -r hg19.fa -s 2
+refinereads -i in.bam -o out.bam -r hg19.fa -s 2
 ```
 If you want to keep all the DNA fragments, we can set `supporting_reads` to 1 (this option can be used to replace `picard markduplicate` to deduplication):
 ```
-gencore -i in.bam -o out.bam -r hg19.fa -s 1
+refinereads -i in.bam -o out.bam -r hg19.fa -s 1
 ```
 (Recommanded) If you want to keep all the DNA fragments, and for each output read you want to discard all the low quality unoverlapped mutations to obtain a relative clean data (recommended for dup-rate < 50%):
 ```
-gencore -i in.bam -o out.bam -r hg19.fa -s 1 --score_threshold=9
+refinereads -i in.bam -o out.bam -r hg19.fa -s 1 --score_threshold=9
 ```
 If you want to obtain fewer but ultra clean data, and your data has UMI, you can enable the `duplex_only` option, and increase the `supporting_reads` and the `ratio_threshold`:
 ```
-gencore -i in.bam -o out.bam -r hg19.fa --duplex_only -s 3 --ratio_threshold=0.9
+refinereads -i in.bam -o out.bam -r hg19.fa --duplex_only -s 3 --ratio_threshold=0.9
 ```
 Please note that only UMI-integrated paired-end data can be used to generate duplex consensuses sequences.
 
@@ -218,6 +203,6 @@ options:
   -?, --help                     print this message
 ```
 # citation
-The gencore paper has been published in  BMC Bioinformatics: https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-3280-9. If you used gencore in your research work, please cite it as:
+The refinereads paper has been published in  BMC Bioinformatics: https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-3280-9. If you used gencore in your research work, please cite it as:
 
 Chen, S., Zhou, Y., Chen, Y. et al. Gencore: an efficient tool to generate consensus reads for error suppressing and duplicate removing of NGS data. BMC Bioinformatics 20, 606 (2019) doi:10.1186/s12859-019-3280-9
