@@ -33,6 +33,7 @@ int main(int argc, char* argv[]){
     cmd.add<string>("bed", 'b', "bed file to specify the capturing region, none by default", false, "");
     cmd.add("duplex_only", 'x', "only output duplex consensus sequences, which means single stranded consensus sequences will be discarded.");
     cmd.add("no_duplex", 0, "don't merge single stranded consensus sequences to duplex consensus sequences.");
+    cmd.add("vv", 'z', "don't statistic the variation variety information in different duplicated group.");
     
     // UMI
     cmd.add<string>("umi_prefix", 'u', "the prefix for UMI, if it has. None by default. Check the README for the defails of UMI formats.", false, "auto");
@@ -51,6 +52,7 @@ int main(int argc, char* argv[]){
     // reporting
     cmd.add<string>("json", 'j', "the json format report file name", false, "refinereads.json");
     cmd.add<string>("html", 'h', "the html format report file name", false, "refinereads.html");
+    cmd.add<string>("var", 'v', "the statistic for variation variety file name", false, "variety.var");
 
     // debugging
     cmd.add("debug", 0, "output some debug information to STDERR.");
@@ -77,6 +79,7 @@ int main(int argc, char* argv[]){
     opt.debug = cmd.exist("debug");
     opt.duplexOnly = cmd.exist("duplex_only");
     opt.disableDuplex = cmd.exist("no_duplex");
+    opt.vvStat = cmd.exist("vv");
     if(opt.duplexOnly && opt.disableDuplex) {
         error_exit("You cannot enable both duplex_only and no_duplex");
     }
@@ -84,6 +87,7 @@ int main(int argc, char* argv[]){
     // reporting
     opt.jsonFile = cmd.get<string>("json");
     opt.htmlFile = cmd.get<string>("html");
+    opt.vvFile = cmd.get<string>("var");
 
     opt.validate();
     

@@ -32,6 +32,8 @@ public:
     string jsonFile;
     // html file
     string htmlFile;
+    // var group stat file (variation variety)
+    string vvFile;
 
     // thresholds
     int properReadsUmiDiffThreshold;
@@ -58,6 +60,7 @@ public:
 
     bool duplexOnly;
     bool disableDuplex;
+    bool vvStat;
 };
 
 #endif

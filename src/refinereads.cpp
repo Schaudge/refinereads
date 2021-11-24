@@ -290,6 +290,16 @@ void Refinereads::consensus(){
     cerr << endl << "----After refinereads processing:" << endl;
     mPostStats->print();
 
+    // output the variation variety statistic information
+    if (mOptions->vvStat) {
+        ofstream ofs;
+        ofs.open(mOptions->vvFile, ifstream::out);
+        if (mPostStats->varDupVariety.size() > 0)
+            for (auto & puv : mPostStats->varDupVariety)
+                ofs << puv.first << "\t" << puv.second << "\n";
+        ofs.close();
+    }
+
     report();
 }
 

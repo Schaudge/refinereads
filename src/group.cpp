@@ -323,7 +323,7 @@ int Group::makeConsensus(vector<bam1_t* >& reads, bam1_t* out, vector<char*>& sc
      * If you add some additional statistic function for single duplicated reads family, then implement in this method!
      * Modified By Schaudge King from the "gencore" software.
      */
-    if(out == NULL)
+    if (out == NULL)
         return 0;
 
     int diff = 0;
@@ -341,7 +341,7 @@ int Group::makeConsensus(vector<bam1_t* >& reads, bam1_t* out, vector<char*>& sc
     vector<uint8_t *> allqual;
     vector<int> lenDiff;
     // if the sequences are right ones of pairs, we supposed they are aligned on the right (end)
-    for(int r=0; r<reads.size(); r++) {
+    for (int r=0; r<reads.size(); r++) {
         alldata.push_back(bam_get_seq(reads[r]));
         allqual.push_back(bam_get_qual(reads[r]));
         int diff = reads[r]->core.l_qseq - out->core.l_qseq;
@@ -357,30 +357,30 @@ int Group::makeConsensus(vector<bam1_t* >& reads, bam1_t* out, vector<char*>& sc
     uint8_t * outqual = bam_get_qual(out);
 
     int len = out->core.l_qseq;
-    if(out->core.n_cigar == 0) {
-        for(int r=0; r<reads.size(); r++) {
-            if(reads[r]->core.l_qseq < len)
+    if (out->core.n_cigar == 0) {
+        for (int r=0; r<reads.size(); r++) {
+            if (reads[r]->core.l_qseq < len)
                 len = reads[r]->core.l_qseq;
         }
     }
 
     const unsigned char* refdata = NULL;
-    if(out->core.isize != 0) {
+    if (out->core.isize != 0) {
         refdata = Reference::instance(mOptions)->getData(out->core.tid, out->core.pos, BamUtil::getRefOffset(out, len-1) + 1);
-        if(refdata == NULL && mOptions->debug)
+        if (refdata == NULL && mOptions->debug)
             cerr << "ref data is NULL for " << out->core.tid << ":" << out->core.pos << endl;
     }
     // loop all the position of out
-    for(int i=0; i<len; i++) {
+    for (int i=0; i<len; i++) {
         int counts[16]={0};
         int baseScores[16]={0};
         int quals[16]={0};
         uint8_t topQuals[16] = {0};
-        // int totalqual = 0;
         int totalScore = 0;
 
         // get the reference base into 4 bit format at this position ( A->1; C->2; G->4; T->8; N->15 )
         uint8_t refbase4bit = {0};
+        uint8_t addedbase = {0xFF};
         int refpos = 0;
         if (refdata) {
             refpos = BamUtil::getRefOffset(out, i);
@@ -390,15 +390,15 @@ int Group::makeConsensus(vector<bam1_t* >& reads, bam1_t* out, vector<char*>& sc
             }
         }
 
-        if(refbase4bit > 8) refbase4bit = 0;
+        if (refbase4bit > 8) refbase4bit = 0;
 
-        for(int r=0; r<reads.size(); r++) {
+        for (int r=0; r<reads.size(); r++) {
             int readpos = i;
             if(!isLeft)
                 readpos = i + lenDiff[r];
             uint8_t base = 0;
             uint8_t qual = allqual[r][readpos];
-            if(readpos%2 == 1)
+            if (readpos%2 == 1)
                 base = alldata[r][readpos/2] & 0xF;
             else
                 base = (alldata[r][readpos/2]>>4) & 0xF;
@@ -406,10 +406,11 @@ int Group::makeConsensus(vector<bam1_t* >& reads, bam1_t* out, vector<char*>& sc
             baseScores[base] += scores[r][readpos];
             totalScore += scores[r][readpos];
             quals[base] += qual;
-            // totalqual += qual;
-            if(qual > topQuals[base])
+            if (qual > topQuals[base])
                 topQuals[base] = qual;
-            if (refbase4bit != 0 && base != refbase4bit && qual >= mOptions->lowQuality) {
+            // make sure one base added once in one duplicated group by the & bit operator with addedbase
+            if (refbase4bit != 0 && base != refbase4bit && qual >= mOptions->lowQuality && (addedbase & base) > 0) {
+                addedbase &= (~base);
                 std::string pos_uniq_var = to_string(out->core.tid) + ":" + to_string(out->core.pos + refpos + 1) +
                         ":" + BamUtil::fourbits2base(base);
                 postStats->addDupVariety(pos_uniq_var);
@@ -431,7 +432,7 @@ int Group::makeConsensus(vector<bam1_t* >& reads, bam1_t* out, vector<char*>& sc
         // get the secondary representative base at this position
         uint8_t secBase=0;
         int secScore = -0x7FFFFFFF;
-        for(uint8_t b=0; b<16; b++) {
+        for (uint8_t b=0; b<16; b++) {
             if(b == topBase)
                 continue;
             if(baseScores[b] > secScore || (baseScores[b] == secScore && quals[b] > quals[secBase])) {

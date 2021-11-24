@@ -15,6 +15,10 @@ Stats::Stats(Options* opt) {
 	mIsPostStats = false;
 	mSSCSNum = 0;
 	mDCSNum = 0;
+    // The Stats class's ctor may be affected by memset (hinder STL initialization), and the STL vector and map
+    // ctor do not work well, so here the clear() method make the ctor for the vector and map!
+    mGenomeDepth.clear();
+    varDupVariety.clear();
 }
 
 Stats::~Stats() {
@@ -36,13 +40,11 @@ void Stats::addDCS() {
 }
 
 void Stats::addDupVariety(const string& puv) {
-    // varDupVariety.clear();
     if (varDupVariety.find(puv) == varDupVariety.end()) varDupVariety[puv] = 1;
     else varDupVariety[puv] += 1;
 }
 
 void Stats::makeGenomeDepthBuf() {
-	mGenomeDepth.clear();
 	for(int c=0; c<mOptions->bamHeader->n_targets; c++) {
         long targetLen = mOptions->bamHeader->target_len[c];
         long depthBufLen = 1 + targetLen / mOptions->coverageStep;
@@ -223,9 +225,7 @@ void Stats::print() {
 		cerr << "Single Stranded Consensus Sequence (has 'FR' tag): " << mSSCSNum << endl;
 		cerr << "Duplex Consensus Sequence (has both 'FS' and 'RR' tags): " << mDCSNum << endl;
 	}
-    if (varDupVariety.size() > 0)
-        for (auto & puv : varDupVariety)
-            cerr << puv.first << " ==> " << puv.second << "\n";
+
 }
 
 string Stats::list2string(double* list, int size) {
