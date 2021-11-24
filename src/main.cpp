@@ -33,7 +33,7 @@ int main(int argc, char* argv[]){
     cmd.add<string>("bed", 'b', "bed file to specify the capturing region, none by default", false, "");
     cmd.add("duplex_only", 'x', "only output duplex consensus sequences, which means single stranded consensus sequences will be discarded.");
     cmd.add("no_duplex", 0, "don't merge single stranded consensus sequences to duplex consensus sequences.");
-    cmd.add("vv", 'z', "don't statistic the variation variety information in different duplicated group.");
+    cmd.add("vv", 'z', "statistic the variation variety information in different duplicated group. And disabled if it's not specified.");
     
     // UMI
     cmd.add<string>("umi_prefix", 'u', "the prefix for UMI, if it has. None by default. Check the README for the defails of UMI formats.", false, "auto");
