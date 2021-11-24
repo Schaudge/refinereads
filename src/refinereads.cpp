@@ -226,7 +226,8 @@ void Refinereads::consensus(){
                 hasPE = true;
         }
         if(count == 1000 && hasPE == false) {
-            cerr << "WARNING: seems that the input data is single-end, refinereads will not make consensus read and remove duplication for SE data since grouping by coordination will be inaccurate." << endl << endl;
+            cerr << "WARNING: seems that the input data is single-end, refinereads will not make consensus read and "
+                    "remove duplication for SE data since grouping by coordination will be inaccurate." << endl << endl;
         }
 
         // check whether the BAM is sorted

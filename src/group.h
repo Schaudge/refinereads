@@ -23,10 +23,9 @@ public:
     void addRead(bam1_t* b);
 
     bool matches(Pair* p);
-    Pair* consensusMerge(bool crossContig);
-    bam1_t* consensusMergeBam(bool isLeft, int& diff);
-    int makeConsensus(vector<bam1_t* >& reads, bam1_t* out, vector<char*>& scores, bool isLeft);
-
+    Pair* consensusMerge(bool crossContig, Stats* postStats);
+    bam1_t* consensusMergeBam(bool isLeft, int& diff, Stats* postStats);
+    int makeConsensus(vector<bam1_t* >& reads, bam1_t* out, vector<char*>& scores, Stats* postStats, bool isLeft);
 
     int getLeftRef(){return mPairs[0]->getLeftRef();}
     int getRightRef(){return mPairs[0]->getRightRef();}

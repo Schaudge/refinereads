@@ -1,5 +1,4 @@
 #include "stats.h"
-#include <memory.h>
 #include <sstream>
 #include "util.h"
 #include "bamutil.h"
@@ -34,6 +33,12 @@ void Stats::addSSCS() {
 
 void Stats::addDCS() {
 	mDCSNum++;
+}
+
+void Stats::addDupVariety(const string& puv) {
+    // varDupVariety.clear();
+    if (varDupVariety.find(puv) == varDupVariety.end()) varDupVariety[puv] = 1;
+    else varDupVariety[puv] += 1;
 }
 
 void Stats::makeGenomeDepthBuf() {
@@ -218,6 +223,9 @@ void Stats::print() {
 		cerr << "Single Stranded Consensus Sequence (has 'FR' tag): " << mSSCSNum << endl;
 		cerr << "Duplex Consensus Sequence (has both 'FS' and 'RR' tags): " << mDCSNum << endl;
 	}
+    if (varDupVariety.size() > 0)
+        for (auto & puv : varDupVariety)
+            cerr << puv.first << " ==> " << puv.second << "\n";
 }
 
 string Stats::list2string(double* list, int size) {

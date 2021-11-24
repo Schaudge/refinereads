@@ -21,20 +21,6 @@ This tool can eliminate the errors introduced by library preparation and sequenc
 
 `refinereads` accepts a sorted BAM/SAM with its corresponding reference fasta as input, and outputs a sorted BAM/SAM.
 
-# take a quick glance of the informative report
-* Sample HTML report: http://opengene.org/refinereads/refinereads.html
-* Sample JSON report: http://opengene.org/refinereads/refinereads.json
-
-# try refinereads to refinereads above reports
-* BAM file for testing: http://opengene.org/refinereads/input.sorted.bam
-* BED file for testing: http://opengene.org/refinereads/test.bed
-* Reference genome file: [ftp://ftp.ncbi.nlm.nih.gov/sra/reports/Assembly/GRCh37-HG19_Broad_variant/Homo_sapiens_assembly19.fasta](ftp://ftp.ncbi.nlm.nih.gov/sra/reports/Assembly/GRCh37-HG19_Broad_variant/Homo_sapiens_assembly19.fasta)
-* Command for testing: 
-```shell
-refinereads -i input.sorted.bam -o output.bam -r Homo_sapiens_assembly19.fasta -b test.bed --coverage_sampling=50000
-```
-* After the processing is finished, check the `refinereads.html` and `refinereads.json` in the working directory. The option `--coverage_sampling=50000` is to change the default setting `(coverage_sampling=10000)` to generate smaller report files by reducing the coverage sampling rate.
-
 # quick examples
 The simplest way
 ```shell

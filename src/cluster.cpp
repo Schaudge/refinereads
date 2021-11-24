@@ -107,7 +107,7 @@ vector<Pair*> Cluster::clusterByUMI(int umiDiffThreshold, Stats* preStats, Stats
 	vector<Pair*> singleConsensusPairs;
 
 	for(int i=0; i<groups.size(); i++) {
-		Pair* p = groups[i]->consensusMerge(crossContig);
+		Pair* p = groups[i]->consensusMerge(crossContig, postStats);
 		singleConsensusPairs.push_back(p);
 		delete groups[i];
 		groups[i] = NULL;

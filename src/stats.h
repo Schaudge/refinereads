@@ -14,7 +14,7 @@
 
 #define MAX_SUPPORTING_READS 100
 
-class Stats{
+class Stats {
 public:
     Stats(Options* opt);
     ~Stats();
@@ -29,7 +29,7 @@ public:
     void reportJSON(ofstream& ofs);
     double getMappingRate();
     double getDupRate();
-    long getMolecules() {return mMolecule;}
+    long getMolecules() { return mMolecule; }
     double getMismatchRate();
     void makeGenomeDepthBuf();
     void makeBedStats(Bed* other = NULL);
@@ -37,6 +37,7 @@ public:
     void setPostStats(bool flag);
     void addSSCS();
     void addDCS();
+    void addDupVariety(const string& upv); // position unique variation, similar to Variation Description in VarDictJava.
 
 public:    
 	static string list2string(double* list, int size);
@@ -58,11 +59,12 @@ public:
 	long mRead;
 	long mReadUnmapped;
     long uncountedSupportingReads;
-    vector<vector<long>> mGenomeDepth;
-    Bed* mBedStats;
     bool mIsPostStats;
     long mSSCSNum;
     long mDCSNum;
+    vector<vector<long>> mGenomeDepth;
+    map<string, unsigned int> varDupVariety; // mutation occurs in multiple different duplicated group statistic
+    Bed* mBedStats;
 };
 
 #endif

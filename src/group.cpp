@@ -65,7 +65,7 @@ bool Group::isDuplex(const string& umi1, const string& umi2) {
         return false;
 }
 
-Pair* Group::consensusMerge(bool crossContig) {
+Pair* Group::consensusMerge(bool crossContig, Stats* postStats) {
     int leftDiff = 0;
     int rightDiff = 0;
 
@@ -98,8 +98,8 @@ Pair* Group::consensusMerge(bool crossContig) {
         }
     }
 
-    bam1_t* left = consensusMergeBam(true, leftDiff);
-    bam1_t* right = consensusMergeBam(false, rightDiff);
+    bam1_t* left = consensusMergeBam(true, leftDiff, postStats);
+    bam1_t* right = consensusMergeBam(false, rightDiff, postStats);
 
     Pair *p = new Pair(mOptions);
     p->mMergeReads = mPairs.size();
@@ -133,7 +133,7 @@ Pair* Group::consensusMerge(bool crossContig) {
     return p;
 }
 
-bam1_t* Group::consensusMergeBam(bool isLeft, int& diff) {
+bam1_t* Group::consensusMergeBam(bool isLeft, int& diff, Stats* postStats) {
     vector<Pair*> allPairs;
     map<string, Pair*>::iterator iterOfPairs;
     for(iterOfPairs = mPairs.begin(); iterOfPairs!=mPairs.end(); iterOfPairs++) {
@@ -312,12 +312,17 @@ bam1_t* Group::consensusMergeBam(bool isLeft, int& diff) {
         }
     }
 
-    diff = makeConsensus(reads, out, scores, leftReadMode);
+    diff = makeConsensus(reads, out, scores, postStats, leftReadMode);
 
     return out;
 }
 
-int Group::makeConsensus(vector<bam1_t* >& reads, bam1_t* out, vector<char*>& scores, bool isLeft) {
+int Group::makeConsensus(vector<bam1_t* >& reads, bam1_t* out, vector<char*>& scores, Stats* postStats, bool isLeft) {
+    /*
+     * we assume that all reads contained in "reads" vector construct one unique group to be duplicated!
+     * If you add some additional statistic function for single duplicated reads family, then implement in this method!
+     * Modified By Schaudge King from the "gencore" software.
+     */
     if(out == NULL)
         return 0;
 
@@ -371,8 +376,22 @@ int Group::makeConsensus(vector<bam1_t* >& reads, bam1_t* out, vector<char*>& sc
         int baseScores[16]={0};
         int quals[16]={0};
         uint8_t topQuals[16] = {0};
-        int totalqual = 0;
+        // int totalqual = 0;
         int totalScore = 0;
+
+        // get the reference base into 4 bit format at this position ( A->1; C->2; G->4; T->8; N->15 )
+        uint8_t refbase4bit = {0};
+        int refpos = 0;
+        if (refdata) {
+            refpos = BamUtil::getRefOffset(out, i);
+            if (refpos >= 0) {
+                char refbase = FastaReader::getBase(refdata, out->core.pos + refpos);
+                refbase4bit = BamUtil::base2fourbits(refbase);
+            }
+        }
+
+        if(refbase4bit > 8) refbase4bit = 0;
+
         for(int r=0; r<reads.size(); r++) {
             int readpos = i;
             if(!isLeft)
@@ -387,11 +406,17 @@ int Group::makeConsensus(vector<bam1_t* >& reads, bam1_t* out, vector<char*>& sc
             baseScores[base] += scores[r][readpos];
             totalScore += scores[r][readpos];
             quals[base] += qual;
-            totalqual += qual;
+            // totalqual += qual;
             if(qual > topQuals[base])
                 topQuals[base] = qual;
+            if (refbase4bit != 0 && base != refbase4bit && qual >= mOptions->lowQuality) {
+                std::string pos_uniq_var = to_string(out->core.tid) + ":" + to_string(out->core.pos + refpos + 1) +
+                        ":" + BamUtil::fourbits2base(base);
+                postStats->addDupVariety(pos_uniq_var);
+            }
         }
-        // get the best representive base at this position
+
+        // get the best representative base at this position
         uint8_t topBase=0;
         int topScore = -0x7FFFFFFF;
         for(uint8_t b=0; b<16; b++) {
@@ -403,7 +428,7 @@ int Group::makeConsensus(vector<bam1_t* >& reads, bam1_t* out, vector<char*>& sc
         int topNum = counts[topBase];
         uint8_t topQual = topQuals[topBase];
 
-        // get the secondary representive base at this position
+        // get the secondary representative base at this position
         uint8_t secBase=0;
         int secScore = -0x7FFFFFFF;
         for(uint8_t b=0; b<16; b++) {
@@ -427,19 +452,8 @@ int Group::makeConsensus(vector<bam1_t* >& reads, bam1_t* out, vector<char*>& sc
                 needToCheckRef = true;
         }
 
-        char refbase = 0;
-        if(refdata) {
-            int refpos = BamUtil::getRefOffset(out, i);
-            if(refpos >= 0) {
-                refbase = FastaReader::getBase(refdata, out->core.pos + refpos);
-            }
-        }
-
-        if(refbase!='A' && refbase!='T' && refbase!='C' && refbase!='G')
-            refbase = 0;
-
         // the secondary base is a single base
-        if(secNum ==1){
+        if (secNum == 1) {
             // low quality secondary
             if(quals[secBase] <= mOptions->lowQuality) {
                 // the candidate is less than 2 consistent bases and no high quality bases
@@ -457,7 +471,7 @@ int Group::makeConsensus(vector<bam1_t* >& reads, bam1_t* out, vector<char*>& sc
         }
 
         // more than one secondary bases
-        if(secNum >1) {
+        if (secNum > 1) {
             // the candidate is less than 80% consistent bases or they are all bad quality
             if ((double)topScore < mOptions->scorePercentReq * totalScore || topQual < mOptions->moderateQuality)
                 needToCheckRef = true;
@@ -467,8 +481,7 @@ int Group::makeConsensus(vector<bam1_t* >& reads, bam1_t* out, vector<char*>& sc
             needToCheckRef = true;
 
         // integrate reference if it's possible
-        if(needToCheckRef && refbase!=0) {
-            uint8_t refbase4bit = BamUtil::base2fourbits(refbase);
+        if(needToCheckRef && refbase4bit != 0) {
             // check if there is one high quality base consistent to ref
             char refBaseQual = 0;
             for(int r=0; r<reads.size(); r++) {
@@ -514,8 +527,7 @@ int Group::makeConsensus(vector<bam1_t* >& reads, bam1_t* out, vector<char*>& sc
                 outdata[i/2] = (outdata[i/2] & 0x0F) | (topBase << 4);
             diff++;
 
-            if(refbase!=0) {
-                uint8_t refbase4bit = BamUtil::base2fourbits(refbase);
+            if(refbase4bit != 0) {
                 if(outBase == refbase4bit) 
                     mismatchInc++;
                 else if(topBase == refbase4bit) 
