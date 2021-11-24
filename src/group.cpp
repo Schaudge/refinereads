@@ -409,7 +409,8 @@ int Group::makeConsensus(vector<bam1_t* >& reads, bam1_t* out, vector<char*>& sc
             if (qual > topQuals[base])
                 topQuals[base] = qual;
             // make sure one base added once in one duplicated group by the & bit operator with addedbase
-            if (refbase4bit != 0 && base != refbase4bit && qual >= mOptions->lowQuality && (addedbase & base) > 0) {
+            if (mOptions->vvStat && refbase4bit != 0 && base != refbase4bit &&
+                qual >= mOptions->lowQuality && (addedbase & base) > 0) {
                 addedbase &= (~base);
                 std::string pos_uniq_var = to_string(out->core.tid) + ":" + to_string(out->core.pos + refpos + 1) +
                         ":" + BamUtil::fourbits2base(base);
