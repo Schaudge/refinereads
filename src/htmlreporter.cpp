@@ -162,7 +162,9 @@ long HtmlReporter::getYCeiling(vector<vector<long>> list, int denominator) {
             }
         }
     }
-    return topvalues[0];
+    long first_top = topvalues[0];
+    delete [] topvalues; // !! release the allocated memory
+    return first_top;
 }
 
 void HtmlReporter::reportCoverage(ofstream& ofs, Stats* preStats, Stats* postStats) {
