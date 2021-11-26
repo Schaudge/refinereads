@@ -39,9 +39,10 @@ void Stats::addDCS() {
 	mDCSNum++;
 }
 
-void Stats::addDupVariety(const string& puv) {
-    if (varDupVariety.find(puv) == varDupVariety.end()) varDupVariety[puv] = 1;
-    else varDupVariety[puv] += 1;
+void Stats::addDupVariety(unsigned int tid, const string& puv) {
+    if (varDupVariety.find(tid) == varDupVariety.end()) varDupVariety[tid][puv] = 1;
+    else if (varDupVariety[tid].find(puv) == varDupVariety[tid].end()) varDupVariety[tid][puv] = 1;
+    else varDupVariety[tid][puv] += 1;
 }
 
 void Stats::makeGenomeDepthBuf() {

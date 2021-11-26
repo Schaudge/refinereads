@@ -37,7 +37,8 @@ public:
     void setPostStats(bool flag);
     void addSSCS();
     void addDCS();
-    void addDupVariety(const string& upv); // position unique variation, similar to Variation Description in VarDictJava.
+    // position unique variation description, similar to "Variant Description String" in VarDictJava.
+    void addDupVariety(unsigned int tid, const string& upv);
 
 public:    
 	static string list2string(double* list, int size);
@@ -63,7 +64,8 @@ public:
     long mSSCSNum;
     long mDCSNum;
     vector<vector<long>> mGenomeDepth;
-    map<string, unsigned int> varDupVariety; // mutation occurs in multiple different duplicated group statistic
+    // mutation occurs in multiple different duplicated group statistic, two levels' map make the output sorted
+    map<unsigned int, map<string, int>> varDupVariety;
     Bed* mBedStats;
 };
 

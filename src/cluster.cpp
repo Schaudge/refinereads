@@ -57,6 +57,7 @@ vector<Pair*> Cluster::clusterByUMI(int umiDiffThreshold, Stats* preStats, Stats
     map<string, int> umiCount;
     bool hasUMI = false;
     map<string, Pair*>::iterator iterOfPairs;
+    // TODO: to be optimized
     for(iterOfPairs = mPairs.begin(); iterOfPairs!=mPairs.end(); iterOfPairs++) {
         string umi = iterOfPairs->second->getUMI();
         if(!umi.empty())

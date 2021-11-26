@@ -295,8 +295,9 @@ void Refinereads::consensus(){
         ofstream ofs;
         ofs.open(mOptions->vvFile, ifstream::out);
         if (mPostStats->varDupVariety.size() > 0)
-            for (auto & puv : mPostStats->varDupVariety)
-                ofs << puv.first << "\t" << puv.second << "\n";
+            for (auto & tid : mPostStats->varDupVariety)
+                for (auto & puv : tid.second)
+                    ofs << sam_hdr_tid2name(mBamHeader, tid.first) << ":" << puv.first << "\t" << puv.second << "\n";
         ofs.close();
     }
 

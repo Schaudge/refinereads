@@ -1,7 +1,7 @@
 #include "group.h"
 #include "bamutil.h"
 #include "reference.h"
-#include <memory.h>
+
 
 Group::Group(Options* opt){
     mOptions = opt;
@@ -121,6 +121,8 @@ Pair* Group::consensusMerge(bool crossContig, Stats* postStats) {
             BamUtil::copyQName(right, left);
         }
     }
+
+    // set new consensus read's CIGAR and tag information
     if(left) {
         p->setLeft(left);
         p->mMergeLeftDiff = leftDiff;
@@ -412,9 +414,8 @@ int Group::makeConsensus(vector<bam1_t* >& reads, bam1_t* out, vector<char*>& sc
             if (mOptions->vvStat && refbase4bit != 0 && base != refbase4bit && qual >= mOptions->moderateQuality &&
                 (addedbase & base) > 0) {
                 addedbase &= (~base);
-                std::string pos_uniq_var = to_string(out->core.tid) + ":" + to_string(out->core.pos + refpos + 1) +
-                        ":" + BamUtil::fourbits2base(base);
-                postStats->addDupVariety(pos_uniq_var);
+                std::string pos_uniq_var = to_string(out->core.pos + refpos + 1) + ":" + BamUtil::fourbits2base(base);
+                postStats->addDupVariety(out->core.tid, pos_uniq_var);
             }
         }
 
