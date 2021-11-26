@@ -2,7 +2,7 @@
 #include "bamutil.h"
 #include "reference.h"
 #include "group.h"
-#include <memory.h>
+
 
 Cluster::Cluster(Options* opt){
     mOptions = opt;

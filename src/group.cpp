@@ -414,8 +414,8 @@ int Group::makeConsensus(vector<bam1_t* >& reads, bam1_t* out, vector<char*>& sc
             if (mOptions->vvStat && refbase4bit != 0 && base != refbase4bit && qual >= mOptions->moderateQuality &&
                 (addedbase & base) > 0) {
                 addedbase &= (~base);
-                std::string pos_uniq_var = to_string(out->core.pos + refpos + 1) + ":" + BamUtil::fourbits2base(base);
-                postStats->addDupVariety(out->core.tid, pos_uniq_var);
+                postStats->addDupVariety(out->core.tid, out->core.pos + refpos + 1,
+                                         base == 0x1 ? "A" : (base == 0x2 ? "C" : (base == 0x4 ? "G" : (base == 0x8 ? "T" : "N"))));
             }
         }
 
